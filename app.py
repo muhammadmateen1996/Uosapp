@@ -8,6 +8,18 @@ from defaults import COUNTRY_META
 
 ADMIN_PIN = os.environ.get("ADMIN_PIN", "1234")
 
+# Hugging Face ZeroGPU Spaces refuse to start without at least one @spaces.GPU
+# function. This app needs no GPU, so register a harmless placeholder. It is
+# skipped automatically anywhere the `spaces` package is not installed.
+try:
+    import spaces
+
+    @spaces.GPU
+    def _gpu_placeholder():
+        return None
+except ImportError:
+    pass
+
 CSS = """
 :root { --uos-navy:#0b1f3a; --uos-teal:#00a3ad; --uos-bg:#f4f6f9; }
 .gradio-container { background: var(--uos-bg) !important; max-width: 1100px !important; margin: auto; font-family: 'Segoe UI', Roboto, Arial, sans-serif; }
