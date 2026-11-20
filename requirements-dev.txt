@@ -1,0 +1,3 @@
+gradio==5.34.1
+huggingface_hub
+pytest
