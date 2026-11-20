@@ -41,6 +41,9 @@ button.primary, .primary-btn { background: var(--uos-teal) !important; color:#ff
 .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
 .stat { background:#fff; border-radius:12px; padding:14px 16px; border-left:5px solid var(--uos-teal); box-shadow:0 1px 4px rgba(0,0,0,.08); }
 .stat.big { background:var(--uos-navy); color:#fff; border-left-color:#f5b400; grid-column:1/-1; }
+.stat, .stat .k, .stat .v { color:#0b1f3a; }
+.stat.big .k, .stat.big .v { color:#fff !important; }
+.note, .note * { color:#5b6673 !important; }
 .stat .k { font-size:.8rem; text-transform:uppercase; letter-spacing:.05em; opacity:.7; }
 .stat .v { font-size:1.35rem; font-weight:700; margin-top:2px; }
 .note { color:#5b6673; font-size:.9rem; }
@@ -158,7 +161,13 @@ def save_rates(country, buffer, london, main):
 
 
 # ---------- App ----------
-with gr.Blocks(css=CSS, title="UoS Agent Tools", theme=gr.themes.Soft(primary_hue="teal")) as demo:
+FORCE_LIGHT = """() => {
+  document.body.classList.remove('dark');
+  const u = new URL(window.location);
+  if (u.searchParams.get('__theme') !== 'light') { u.searchParams.set('__theme', 'light'); window.location.replace(u); }
+}"""
+
+with gr.Blocks(css=CSS, js=FORCE_LIGHT, title="UoS Agent Tools", theme=gr.themes.Soft(primary_hue="teal")) as demo:
     country = gr.State("")
     unlocked_label = gr.State(False)
 
