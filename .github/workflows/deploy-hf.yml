@@ -1,0 +1,43 @@
+name: Deploy to Hugging Face Space
+on:
+  push:
+    branches: [main, claude/zealous-thompson-ykkc8x]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-hf
+  cancel-in-progress: true
+
+env:
+  HF_USER: Conversation123
+  HF_SPACE: uos-agent-tools
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check token is set
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          if [ -z "$HF_TOKEN" ]; then
+            echo "::error::HF_TOKEN secret is missing. Add it in GitHub: Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+      - name: Push app files to the Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          git clone --depth 1 "https://${HF_USER}:${HF_TOKEN}@huggingface.co/spaces/${HF_USER}/${HF_SPACE}" ../space
+          cp app.py logic.py defaults.py storage.py requirements.txt README.md ../space/
+          cd ../space
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Space already up to date."
+          else
+            git commit -m "Deploy ${GITHUB_SHA::7} from GitHub"
+            git push
+          fi
